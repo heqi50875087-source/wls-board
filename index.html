@@ -333,7 +333,7 @@ function buildTradeLog(){
     </div>`;}).join('')+(ev.length>60?`<div class="cap" style="margin-top:9px">仅显示最近 60 个动作(共 ${ev.length})</div>`:'');
 }
 
-let navChart;
+var navChart;   // var(非let): 提升到脚本顶部, 避免 render() 早于声明行调用时的TDZ崩溃(净值图)
 function buildNav(){
   const nav = S.nav_history;
   const labels = nav.map(n=>n.date.slice(5));
