@@ -282,10 +282,10 @@ function buildJiepan(){
     <div class="mono">今日 <b class="${cls(m['1'])}">${pct(m['1'])}</b> · 上涨占比 ${(j.up_ratio*100||0).toFixed(0)}%</div>
     <div class="mono">近3日 <b class="${cls(m['3'])}">${pct(m['3'])}</b></div>
     <div class="mono">近5日 <b class="${cls(m['5'])}">${pct(m['5'])}</b></div>
-    <div class="muted">信号 ${j.n_all||0} 只 → 精选15</div>
+    <div class="muted">信号 ${j.n_all||0} 只 → 精选 ${(j.picks||[]).length} 只</div>
   </div>
   <div style="font-size:12.5px;line-height:1.7;border-left:2px solid var(--gold);padding-left:12px">${summ}</div>
-  <div class="cap" style="margin-top:10px">${(j.sectors&&j.sectors.length)?('📊 强势板块:'+j.sectors.slice(0,5).join('、')+(j.sec_stale?'（缓存）':'')):'📋 板块数据待恢复(AKShare 真机生效)'};完整解盘见 <code>解盘_${j.date}.md</code>。下方"每日精选"即隔日介入Top15。</div>`;
+  <div class="cap" style="margin-top:10px">${(j.sectors&&j.sectors.length)?('📊 强势板块:'+j.sectors.slice(0,5).join('、')+(j.sec_stale?'（缓存）':'')):'📋 板块数据待恢复(AKShare 真机生效)'};完整解盘见 <code>解盘_${j.date}.md</code>。下方"每日精选"=过门槛的隔日介入标的(每日≤5只,宁缺毋滥,🔥超强=3招共振)。</div>`;
 }
 
 function buildIntraday(){
