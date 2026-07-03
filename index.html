@@ -134,6 +134,12 @@ footer{text-align:center;color:var(--dim);font-size:11.5px;margin-top:18px}
     <div id="jpBody"></div>
   </div>
 
+  <div class="card" id="buySignalCard" style="margin-bottom:14px;display:none">
+    <h2>🔔 盘中买入信号 · 可执行 <span class="hint" id="bsDate"></span></h2>
+    <div class="cap">交易时段引擎每分钟扫描,触发即推手机(实时以Bark为准):<b style="color:var(--goldsoft)">买它=今日精选放量启动(涨≥2%+量比≥1.2)</b> · 可追=强板块领涨强而未板(涨≥3%+量比≥1.5);只推还能买进的(距涨停≥2个百分点),一票一日一推。</div>
+    <div id="bsBody"></div>
+  </div>
+
   <div class="card" id="strongRecCard" style="margin-bottom:14px;display:none">
     <h2>⚡ 定时荐股 · 此刻最强 <span class="hint" id="srDate"></span></h2>
     <div class="cap">交易日 8 时点(9:35/10:00/11:00/11:30/13:30/14:00/14:30/14:50)引擎自选:整点档1~2只、节奏档1~3只;<b style="color:var(--goldsoft)">🔥=精选兑现 ⚡=板块领涨</b>;达不到门槛直说"没有",当日不重复推。</div>
@@ -222,6 +228,7 @@ function render(){
 
   buildAI();
   buildJiepan();
+  buildBuySignals();
   buildStrongRecs();
   buildIntraday();
   buildNav();
@@ -293,6 +300,24 @@ function buildJiepan(){
   </div>
   <div style="font-size:12.5px;line-height:1.7;border-left:2px solid var(--gold);padding-left:12px">${summ}</div>
   <div class="cap" style="margin-top:10px">${(j.sectors&&j.sectors.length)?('📊 强势板块:'+j.sectors.slice(0,5).join('、')+(j.sec_stale?'（缓存）':'')):'📋 板块数据待恢复(AKShare 真机生效)'};完整解盘见 <code>解盘_${j.date}.md</code>。下方"每日精选"=过门槛的隔日介入标的(每日≤5只,宁缺毋滥,🔥超强=3招共振)。</div>`;
+}
+
+function buildBuySignals(){
+  const b=S.buy_signals; if(!b||!b.items||!b.items.length){return;}
+  $('buySignalCard').style.display='block';
+  $('bsDate').textContent=b.date+' · 倒序,最新在上';
+  $('bsBody').innerHTML=b.items.slice().reverse().map(s=>{
+    const tag=s.kind==='A'
+      ?'<span style="font-weight:700;color:var(--up);background:rgba(242,85,90,.15);border:1px solid rgba(242,85,90,.4);border-radius:7px;padding:2px 8px;font-size:11.5px">🔔买它</span>'
+      :'<span style="font-weight:700;color:var(--goldsoft);background:rgba(217,164,65,.14);border:1px solid rgba(217,164,65,.4);border-radius:7px;padding:2px 8px;font-size:11.5px">🔔可追</span>';
+    const meta=[s.reason||'', '量比'+(s.vr!=null?s.vr.toFixed(1):'—'), '距涨停'+(s.gap!=null?s.gap+'%':'—'),
+                s.stop?('止损'+s.stop+' 目标'+(s.target||'—')):''].filter(Boolean).join(' · ');
+    return `<div style="display:flex;gap:12px;align-items:flex-start;padding:8px 0;border-bottom:1px dashed var(--border)">
+      <span class="mono" style="flex:none;min-width:46px;text-align:center;color:var(--muted);font-size:12px;padding-top:2px">${s.time||''}</span>
+      <div style="flex:1;min-width:0">${tag} <b class="mono">${s.code}</b> ${s.name||''}
+        <b class="${cls(s.pct)}" style="margin-left:6px">${pct(s.pct)}</b>
+        <div class="muted" style="font-size:11.5px;margin-top:3px">${meta}</div></div></div>`;
+  }).join('');
 }
 
 function buildStrongRecs(){
