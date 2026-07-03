@@ -134,6 +134,12 @@ footer{text-align:center;color:var(--dim);font-size:11.5px;margin-top:18px}
     <div id="jpBody"></div>
   </div>
 
+  <div class="card" id="strongRecCard" style="margin-bottom:14px;display:none">
+    <h2>⚡ 定时荐股 · 此刻最强 <span class="hint" id="srDate"></span></h2>
+    <div class="cap">交易日 8 时点(9:35/10:00/11:00/11:30/13:30/14:00/14:30/14:50)引擎自选:整点档1~2只、节奏档1~3只;<b style="color:var(--goldsoft)">🔥=精选兑现 ⚡=板块领涨</b>;达不到门槛直说"没有",当日不重复推。</div>
+    <div id="srBody"></div>
+  </div>
+
   <div class="card" id="intradayCard" style="margin-bottom:14px;display:none">
     <h2>盘中时间线 <span class="hint" id="izDate"></span></h2>
     <div class="cap">每个交易日 6 个盘中时点(9:45/10:00/10:15/10:30/13:00/14:00)自动快照大盘强弱与15选实时表现。</div>
@@ -216,6 +222,7 @@ function render(){
 
   buildAI();
   buildJiepan();
+  buildStrongRecs();
   buildIntraday();
   buildNav();
   buildHit();
@@ -286,6 +293,24 @@ function buildJiepan(){
   </div>
   <div style="font-size:12.5px;line-height:1.7;border-left:2px solid var(--gold);padding-left:12px">${summ}</div>
   <div class="cap" style="margin-top:10px">${(j.sectors&&j.sectors.length)?('📊 强势板块:'+j.sectors.slice(0,5).join('、')+(j.sec_stale?'（缓存）':'')):'📋 板块数据待恢复(AKShare 真机生效)'};完整解盘见 <code>解盘_${j.date}.md</code>。下方"每日精选"=过门槛的隔日介入标的(每日≤5只,宁缺毋滥,🔥超强=3招共振)。</div>`;
+}
+
+function buildStrongRecs(){
+  const r=S.strong_recs; if(!r||!r.slots||!r.slots.length){return;}
+  $('strongRecCard').style.display='block';
+  $('srDate').textContent=r.date+' · 倒序,最新在上';
+  const rows=r.slots.slice().reverse().map(sl=>{
+    const chip=`<span class="mono" style="flex:none;min-width:52px;text-align:center;font-weight:700;border-radius:8px;padding:4px 8px;${sl.none?'background:var(--panel2);color:var(--muted);border:1px solid var(--border)':'background:rgba(217,164,65,.14);color:var(--goldsoft);border:1px solid rgba(217,164,65,.4)'}">${sl.hhmm}</span>`;
+    const body=sl.none
+      ? `<div class="muted" style="font-size:12.5px;line-height:1.6">没有 · 无足够强势标的,宁缺毋滥</div>`
+      : (sl.picks||[]).map(p=>`<div style="margin:2px 0 6px">
+          <span>${p.src==='精选'?'🔥':'⚡'}</span> <b class="mono">${p.code}</b> ${p.name||''}
+          <b class="${cls(p.pct)}" style="margin-left:6px">${pct(p.pct)}</b>
+          <span class="muted" style="font-size:11.5px;margin-left:8px">${p.reason||''} · 强势度${p.score}</span>
+        </div>`).join('');
+    return `<div style="display:flex;gap:12px;align-items:flex-start;padding:8px 0;border-bottom:1px dashed var(--border)">${chip}<div style="flex:1;min-width:0">${body}</div></div>`;
+  }).join('');
+  $('srBody').innerHTML=rows;
 }
 
 function buildIntraday(){
