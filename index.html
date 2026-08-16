@@ -241,7 +241,8 @@ function render(){
 
   $('note').innerHTML = `<b>当下策略配置(融合版·经六维验证定档)·</b> 5招(外侧三红/晨星/内困三红/晨星弃婴/孤岛晨星,均为"按日聚类bootstrap后仍显著正期望"的招;已剔除不显著的反锤穿顶) + <b style="color:var(--goldsoft)">共振评分</b> + 门槛≥0.52。验证发现:融合5因子里<b>只有"共振"是真增益</b>(1招52%→3+招59%,显著且跨窗稳定);30分确认经查为伪增益(同义反复)已不参与排序。<br>
   <b>三窗复验</b>:<b style="color:var(--up)">+4.3% / +10.7% / +8.0%</b>(全跑赢大盘),全程472日复利超额 +9.5%。<br>
-  <b>⚠️ 最重要的诚实结论</b>:这是<b>防御型/非牛市alpha</b>——超额与大盘强度<b>负相关(-0.85)</b>:平市/弱市/温和市稳定跑赢、且抗跌优于大盘(弱市段超额+21.6%);但<b>暴力普涨牛市会结构性跑输指数</b>(选择性建仓+紧止损被扫损、资金闲置)。能赚钱≠能跑赢——牛市别单靠它博超额。命中率~48%(<50%),靠2倍盈亏比盈利。每天更新,持续检验。`;
+  <b>⚠️ 最重要的诚实结论</b>:这是<b>防御型/非牛市alpha</b>——平市/弱市/温和市稳定跑赢、抗跌优于大盘;但<b>暴力普涨牛市会结构性跑输指数</b>(选择性建仓+紧止损被扫损、资金闲置)。能赚钱≠能跑赢——牛市别单靠它博超额。<b>选股本身没有被证实的超额</b>:全档候选扣掉同窗大盘后命中约44%、日聚类t≈0,赚钱主要来自<b>择时闸门</b>(强市才出手)而非"挑得准"。每天更新,持续检验。<br>
+  <span style="color:var(--dim)">口径提醒(2026-08-16):净值曲线已按现行双达标出场从 2025-12-18 整段重放,与此前截图对不上是预期内的;旧的「-0.85负相关/弱市超额+21.6%/命中率48%靠2倍盈亏比」是按已作废纪律算的,已撤下待重算。</span>`;
 
   $('navhint').textContent = `${pct(sm.return_total)} vs 大盘 ${pct(sm.bench_total)}`;
   $('navhint').className = 'hint '+cls(sm.return_total);
@@ -422,9 +423,15 @@ function buildHit(){
     </div>`;
   }).join('');
   const tw=S.summary.tracking||{};
-  const twC=tw.h5_hit_rate==null?css('--dim'):(tw.h5_hit_rate>=0.5?css('--up'):css('--down'));
+  // 颜色只认扣基准后的数(取A/B两界里较差的一界)。原始命中率在普涨行情里必然发绿=躺赢beta,
+  // 2026-08-14 实测: 原始70.8%/+3.48%, 而同窗大盘就涨了+3.46%, 扣完只剩37.5%/+0.02%。
+  const exWorst=(tw.h5_ex_hit_a==null||tw.h5_ex_hit_b==null)?null:Math.min(tw.h5_ex_hit_a,tw.h5_ex_hit_b);
+  const twC=exWorst==null?css('--dim'):(exWorst>=0.5?css('--up'):css('--down'));
   const twLine=`<div style="margin-top:4px;padding-top:11px;border-top:1px solid var(--border);font-size:12px;color:var(--muted)">
-    📅 近2周跟踪(${tw.window_days||0}个交易日 · ${tw.n_picks||0}选)· 5日命中 <b class="mono" style="color:${twC}">${tw.h5_hit_rate==null?'—':(tw.h5_hit_rate*100).toFixed(0)+'%'}</b> · 5日均收 <b class="mono ${cls(tw.h5_avg)}">${pct(tw.h5_avg,1)}</b> <span class="hn mono" style="margin-left:3px">成熟${tw.h5_n||0}</span></div>`;
+    📅 近2周跟踪(${tw.window_days||0}个交易日 · ${tw.n_picks||0}选 · 成熟${tw.h5_n||0})
+    <div style="margin-top:3px">原始 5日命中 <b class="mono" style="color:var(--dim)">${tw.h5_hit_rate==null?'—':(tw.h5_hit_rate*100).toFixed(0)+'%'}</b> · 均收 <b class="mono" style="color:var(--dim)">${pct(tw.h5_avg,1)}</b> <span class="hn">(含大盘涨跌,不作数)</span></div>
+    <div style="margin-top:2px">扣基准 <span class="hn">同窗大盘${pct(tw.h5_bench,1)}</span> · 命中 <b class="mono" style="color:${twC}">${tw.h5_ex_hit_a==null?'—':(tw.h5_ex_hit_a*100).toFixed(0)+'~'+(tw.h5_ex_hit_b*100).toFixed(0)+'%'}</b> · 均收 <b class="mono" style="color:${twC}">${tw.h5_ex_avg_a==null?'—':pct(tw.h5_ex_avg_a,1)+'~'+pct(tw.h5_ex_avg_b,1)}</b> <span class="hn">← 这行才是选股本事</span></div>
+    <div class="hn" style="margin-top:2px">两个数是窗口对齐的严/宽两界:严界多含一夜跳空,宽界少算一天。跨零=与市场同步,不算有本事。</div></div>`;
   $('hit').innerHTML=bars+twLine;
 }
 
